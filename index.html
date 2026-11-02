@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zentro — Otimizador e Limpador Nativo para macOS</title>
+  <meta name="description" content="O otimizador e limpador nativo definitivo para macOS. Desenvolvido por Kenno Bittencourt em Swift puro com estética Dark Glassmorphism.">
+  <link rel="icon" type="image/jpeg" href="docs/assets/logo.jpg">
+  
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #07090E;
+      --card-bg: rgba(18, 24, 38, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent: #38BDF8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --primary: #0284C7;
+      --primary-hover: #0369A1;
+      --text-main: #FFFFFF;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Ambient Glow Backgrounds */
+    .ambient-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.15) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 70%);
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      backdrop-filter: blur(20px);
+      background: rgba(7, 9, 14, 0.8);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+      text-align: center;
+    }
+
+    .author-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: 3.4rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+
+    /* CTA Buttons */
+    .cta-group {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 48px;
+    }
+
+    .btn-download {
+      background: var(--primary);
+      color: #FFF;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-download:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.6);
+    }
+
+    .btn-github {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-github:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .sys-specs {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: -24px;
+      margin-bottom: 50px;
+    }
+
+    /* App Preview Mockup */
+    .mockup-container {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .mockup-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Features Grid */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 90px 24px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .section-header h2 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 1.8rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .feature-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Screenshot Showcase */
+    .showcase-block {
+      margin-top: 40px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .showcase-block img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Installation Steps */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .step-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      margin: 0 auto 16px;
+    }
+
+    .step-card h4 {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .step-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 48px 32px;
+      text-align: center;
+      background: rgba(5, 7, 10, 0.9);
+    }
+
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .footer-author {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .footer-sub {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2.4rem; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .cta-group { flex-direction: column; }
+    }
+
+    /* Support / Contribution Section */
+    .support-card-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 32px;
+      text-align: left;
+    }
+
+    @media (max-width: 860px) {
+      .support-card-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .support-card {
+      background: rgba(20, 27, 41, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .author-header {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .author-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+      box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
+    }
+
+    .author-meta h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .author-meta .alias {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .author-meta .location {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .bio-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .bio-badge-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bio-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .pix-card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .qr-container {
+      background: #FFFFFF;
+      padding: 12px;
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      margin: 16px 0;
+      width: 190px;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .pix-details {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: left;
+    }
+
+    .pix-details .label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pix-details .key {
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text-main);
+      letter-spacing: 1px;
+    }
+
+    .pix-details .beneficiary {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: right;
+    }
+
+    .btn-copy-pix {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-copy-pix:hover {
+      background: var(--primary-hover);
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .social-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .social-insta {
+      color: #FF5E7E;
+    }
+    .social-insta:hover {
+      border-color: #FF5E7E;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#" class="brand">
+      <img src="docs/assets/logo.jpg" alt="Zentro Icon">
+      <span class="brand-title">Zentro</span>
+      <span class="brand-badge">v1.0</span>
+    </a>
+    <div class="nav-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#instalacao">Como Instalar</a>
+      <a href="#apoiar">Apoiar</a>
+      <a href="https://www.instagram.com/kennobittencourt" target="_blank">Instagram</a>
+      <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank">LinkedIn</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="author-tag">
+      <span>👨‍💻 Desenvolvido por Kenno Bittencourt</span>
+    </div>
+    <h1>Otimizador & Limpador<br/>Nativo para macOS</h1>
+    <p>
+      Inspirado na precisão e fluidez do Mac. Limpeza profunda de resíduos, detecção veloz de duplicados e monitoramento de hardware em tempo real para Apple Silicon.
+    </p>
+
+    <div class="cta-group">
+      <a href="https://github.com/kennobitttencourt/Zentro/releases/latest" class="btn-download">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.67-.99 1.74-.86 2.77.99.08 2.01-.52 2.59-1.27z"/>
+        </svg>
+        Baixar para macOS (Apple Silicon)
+      </a>
+      <a href="https://www.linkedin.com/in/antoniojoelson/" class="btn-github" target="_blank">
+        Conectar no LinkedIn
+      </a>
+    </div>
+
+    <div class="sys-specs">
+      Requer macOS 14.0 (Sonoma) ou macOS 15.0+ (Sequoia) • Apple Silicon (M1/M2/M3/M4)
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="recursos">
+    <div class="section-header">
+      <h2>Tudo o que seu Mac precisa para voar</h2>
+      <p>Desenvolvido em Swift 6 e SwiftUI puro. Consome menos de 25 MB de RAM.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🌟</div>
+        <h3>Smart Care</h3>
+        <p>Orbe giroscópico interativo que analisa a saúde do sistema e compila um relatório de diagnóstico em segundos com 1 clique.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🧹</div>
+        <h3>Limpeza de Sistema</h3>
+        <p>Varredura de caches de usuário, logs de diagnóstico, lixeira, arquivos do Xcode DerivedData e navegadores sem risco.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">👯</div>
+        <h3>Arquivos Duplicados</h3>
+        <p>Motor de identificação por hash SHA-256 ultra-rápido. Encontre fotos, vídeos e instaladores repetidos com descarte seguro.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Mapeamento de Disco</h3>
+        <p>Visualização categorizada do espaço em disco e filtro inteligente para localizar grandes arquivos esquecidos (>100MB).</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🗑️</div>
+        <h3>Desinstalador Completo</h3>
+        <p>Remova aplicativos e todos os arquivos residuais ocultos em <code>~/Library/Application Support</code>, <code>Caches</code> e <code>Preferences</code>.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Monitor & RAM</h3>
+        <p>Estatísticas em tempo real direto do kernel Darwin/Mach, gráficos de histórico de CPU/RAM e botão de liberação de páginas inativas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Steps -->
+  <section class="section" id="instalacao">
+    <div class="section-header">
+      <h2>Como Instalar o Zentro</h2>
+      <p>Simples, direto e sem instaladores invasivos.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h4>Baixe o Instalador</h4>
+        <p>Faça o download do arquivo <code>.dmg</code> ou <code>.zip</code> da versão mais recente.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h4>Arraste para Aplicativos</h4>
+        <p>Abra o instalador e arraste o ícone do <strong>Zentro</strong> para a sua pasta de Aplicativos.</p>
+      </div>
+
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h4>Pronto para Usar</h4>
+        <p>Abra o Zentro pelo Launchpad ou Spotlight e faça seu primeiro Smart Scan.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Support / Contribution Section -->
+  <section class="section" id="apoiar">
+    <div class="section-header">
+      <div class="author-tag" style="color: #FF5E7E; border-color: rgba(255, 94, 126, 0.3);">
+        <span>❤️ Apoie o Projeto</span>
+      </div>
+      <h2>Mantenha o Zentro Independente</h2>
+      <p>O Zentro é e continuará sendo gratuito e de código aberto. Você pode contribuir com o valor que desejar para apoiar o desenvolvimento contínuo.</p>
+    </div>
+
+    <div class="support-card-container">
+      <!-- Profile Card -->
+      <div class="support-card">
+        <div class="author-header">
+          <img src="docs/assets/kenno.png" alt="Kenno Bittencourt" class="author-avatar" onerror="this.src='docs/assets/kenno.jpeg'">
+          <div class="author-meta">
+            <h3>Kenno Bittencourt</h3>
+            <div class="alias">Antonio Joelson</div>
+            <div class="location">📍 Bahia, Brasil</div>
+          </div>
+        </div>
+
+        <p class="bio-text">
+          Criado com a convicção de que softwares de limpeza não devem espionar, cobrar mensalidades abusivas ou poluir o sistema. O Zentro é desenvolvido de forma independente com foco em performance nativa, transparência e respeito total à privacidade no macOS.
+        </p>
+
+        <div class="bio-badge-list">
+          <div class="bio-badge">
+            <span>🎓</span>
+            <span>Bacharel em Design</span>
+          </div>
+          <div class="bio-badge">
+            <span>🎨</span>
+            <span>Especialista em Design de Produtos Digitais</span>
+          </div>
+          <div class="bio-badge">
+            <span>🛡️</span>
+            <span>Compromisso com privacidade & transparência</span>
+          </div>
+          <div class="bio-badge">
+            <span>⚡</span>
+            <span>Performance nativa macOS & zero rastreadores</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+          <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank" class="social-btn">
+            🔗 LinkedIn
+          </a>
+          <a href="https://www.instagram.com/kennobittencourt" target="_blank" class="social-btn social-insta">
+            📸 Instagram @kennobittencourt
+          </a>
+        </div>
+      </div>
+
+      <!-- PIX Card -->
+      <div class="support-card pix-card-content">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Contribuição via PIX</div>
+        <h4 style="font-size: 1.25rem; font-weight: 700; margin: 4px 0 8px; color: var(--text-main);">Contribua com qualquer valor</h4>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">Aponte a câmera do aplicativo do seu banco para o QR Code abaixo:</p>
+
+        <div class="qr-container">
+          <img src="docs/assets/pix_qrcode.png" alt="QR Code PIX Banco Itaú">
+        </div>
+
+        <div class="pix-details" style="flex-direction: column; align-items: stretch; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="label" style="white-space: nowrap;">Chave Aleatória (Banco Itaú)</span>
+            <span class="beneficiary" style="white-space: nowrap;"><span class="label">Titular:</span> <span style="font-weight: 600; color: var(--text-main);">Antonio Joelson</span></span>
+          </div>
+          <div class="key" id="pixKeyText" style="font-size: 0.92rem; text-align: center; padding: 6px; background: rgba(0,0,0,0.25); border-radius: 6px; letter-spacing: 0.5px;">c234ecbb-6bf3-45e7-b08a-452425e39869</div>
+        </div>
+
+        <button class="btn-copy-pix" id="copyPixBtn" onclick="copyPixKey()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="copyPixBtnText">Copiar Chave Aleatória</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-author">Zentro — Criado e desenvolvido por Kenno Bittencourt</div>
+      <div class="footer-sub">Feito exclusivamente para macOS com Swift e design nativo.</div>
+      <p style="font-size: 0.8rem; color: var(--text-dim);">
+        Copyright © 2026 Kenno Bittencourt. Todos os direitos reservados.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    function copyPixKey() {
+      const key = "c234ecbb-6bf3-45e7-b08a-452425e39869";
+      navigator.clipboard.writeText(key).then(() => {
+        const btn = document.getElementById("copyPixBtn");
+        const btnText = document.getElementById("copyPixBtnText");
+        btn.style.background = "#10B981";
+        btnText.innerText = "✓ Chave PIX Copiada!";
+        setTimeout(() => {
+          btn.style.background = "";
+          btnText.innerText = "Copiar Chave Aleatória";
+        }, 3000);
+      });
+    }
+  </script>
+
+</body>
+</html>
