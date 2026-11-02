@@ -234,6 +234,14 @@
       display: block;
     }
 
+
+    .shot-hero { max-width: 1000px; margin: 0 auto; }
+    .shot-hero img, .shot img { width: 100%; height: auto; display: block; }
+    .shots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .shot { margin: 0; text-align: center; }
+    .shot figcaption { margin-top: 8px; color: #94a3b8; font-size: 14px; }
+    @media (max-width: 760px) { .shots-grid { grid-template-columns: 1fr; } }
+
     /* Features Grid */
     .section {
       max-width: 1100px;
@@ -585,6 +593,7 @@
     </a>
     <div class="nav-links">
       <a href="#recursos">Recursos</a>
+      <a href="#screenshots">Screenshots</a>
       <a href="#instalacao">Como Instalar</a>
       <a href="#apoiar">Apoiar</a>
       <a href="https://www.instagram.com/kennobittencourt" target="_blank">Instagram</a>
@@ -617,8 +626,12 @@
     <div class="sys-specs">
       Requer macOS 14.0 (Sonoma) ou macOS 15.0+ (Sequoia) • Apple Silicon (M1/M2/M3/M4)
     </div>
-  </section>
 
+    <!-- App Screenshot -->
+    <div class="shot-hero">
+      <img src="docs/assets/screenshots/smart-care.png" alt="Zentro - Smart Care">
+    </div>
+  </section>
   <!-- Features Section -->
   <section class="section" id="recursos">
     <div class="section-header">
@@ -662,6 +675,22 @@
         <h3>Monitor & RAM</h3>
         <p>Estatísticas em tempo real direto do kernel Darwin/Mach, gráficos de histórico de CPU/RAM e botão de liberação de páginas inativas.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Gallery -->
+  <section class="section" id="screenshots">
+    <div class="section-header">
+      <h2>Veja o Zentro em ação</h2>
+      <p>Capturas reais do aplicativo rodando no macOS.</p>
+    </div>
+
+    <div class="shots-grid">
+      <figure class="shot"><img src="docs/assets/screenshots/scan.png" alt="Zentro - Diagnóstico em andamento" loading="lazy"><figcaption>Diagnóstico em andamento</figcaption></figure>
+      <figure class="shot"><img src="docs/assets/screenshots/armazenamento.png" alt="Zentro - Armazenamento" loading="lazy"><figcaption>Armazenamento</figcaption></figure>
+      <figure class="shot"><img src="docs/assets/screenshots/desinstalador.png" alt="Zentro - Desinstalador" loading="lazy"><figcaption>Desinstalador</figcaption></figure>
+      <figure class="shot"><img src="docs/assets/screenshots/inicializacao.png" alt="Zentro - Inicialização" loading="lazy"><figcaption>Inicialização</figcaption></figure>
+      <figure class="shot"><img src="docs/assets/screenshots/monitor.png" alt="Zentro - Monitor &amp; RAM" loading="lazy"><figcaption>Monitor &amp; RAM</figcaption></figure>
     </div>
   </section>
 
