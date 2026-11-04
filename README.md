@@ -10,8 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/kennobitttencourt/Zentro/releases/latest">
+  <a href="https://github.com/Kennobittencourt/Zentro/releases/latest">
     <img src="https://img.shields.io/badge/⬇️%20Download-Zentro%20para%20macOS%20(Apple%20Silicon)-0284C7.svg?style=for-the-badge&logo=apple" alt="Baixar Zentro" />
+  </a>
+  <a href="https://kennobittencourt.github.io/Zentro/">
+    <img src="https://img.shields.io/badge/🌐%20Página%20Oficial-kennobittencourt.github.io%2FZentro-1E293B.svg?style=for-the-badge" alt="Página Oficial" />
   </a>
 </p>
 
@@ -65,7 +68,7 @@
 
 ## 📦 Como Instalar no seu Mac
 
-1. Acesse a página de **[Releases Oficiais](https://github.com/kennobitttencourt/Zentro/releases/latest)** ou a nossa **[Página Oficial](https://kennobitttencourt.github.io/Zentro/)**.
+1. Acesse a página de **[Releases Oficiais](https://github.com/Kennobittencourt/Zentro/releases/latest)** ou a nossa **[Página Oficial](https://kennobittencourt.github.io/Zentro/)**.
 2. Baixe o instalador oficial: **`Zentro-macOS-arm64.dmg`**.
 3. Abra o arquivo `.dmg` e arraste o ícone do **Zentro** para a pasta **Aplicativos** (`Applications`).
 4. Abra o Zentro pelo Spotlight ou Launchpad e execute o seu primeiro **Smart Care**!
@@ -81,10 +84,11 @@
 
 ---
 
-## 👨‍💻 Código-Fonte & Desenvolvimento
+## 🌐 Links Oficiais
 
-Se você deseja conferir o código-fonte em Swift, compilar localmente ou contribuir:
-👉 Repositório de desenvolvimento: **[github.com/kennobitttencourt/zentro-dev](https://github.com/kennobitttencourt/zentro-dev)**
+- **Página Oficial (Web)**: **[kennobittencourt.github.io/Zentro](https://kennobittencourt.github.io/Zentro/)**
+- **Repositório Público & Releases**: **[github.com/Kennobittencourt/Zentro](https://github.com/Kennobittencourt/Zentro)**
+- **Repositório de Desenvolvimento**: **[github.com/Kennobittencourt/zentro-dev](https://github.com/Kennobittencourt/zentro-dev)**
 
 ---
 
