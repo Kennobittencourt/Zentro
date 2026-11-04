@@ -5,8 +5,8 @@
 <h1 align="center">Zentro</h1>
 
 <p align="center">
-  <b>Otimizador e Limpador Nativo para macOS</b><br/>
-  Desenvolvido por <b>Kenno Bittencourt</b> em Swift puro com design <b>Dark Glassmorphism</b>, orbe giroscópico interativo e gráficos de hardware em tempo real.
+  <b>Otimizador, Limpador e Monitor Nativo para macOS</b><br/>
+  Desenvolvido por <b>Kenno Bittencourt</b> em Swift 6 &amp; SwiftUI puro com estética <b>Dark Glassmorphism</b>, agente inteligente na barra de menus, velocímetro de conexão e telemetria de hardware em tempo real.
 </p>
 
 <p align="center">
@@ -19,6 +19,7 @@
   <img src="https://img.shields.io/badge/Versão-1.0.0-38BDF8.svg?style=flat-square" alt="v1.0.0" />
   <img src="https://img.shields.io/badge/Desenvolvedor-Kenno%20Bittencourt-38BDF8.svg?style=flat-square" alt="Kenno Bittencourt" />
   <img src="https://img.shields.io/badge/Plataforma-macOS%2014.0%2B%20(Apple%20Silicon)-black.svg?style=flat-square&logo=apple" alt="macOS 14+" />
+  <img src="https://img.shields.io/badge/Idiomas-PT--BR%20%7C%20EN%20%7C%20ES-10B981.svg?style=flat-square" alt="Idiomas PT-BR | EN | ES" />
   <img src="https://img.shields.io/badge/Licença-MIT-emerald.svg?style=flat-square" alt="License MIT" />
 </p>
 
@@ -47,44 +48,43 @@
 
 ---
 
-## 📦 Como Instalar no seu Mac (Sem complicação)
+## ✨ Recursos Principais
 
-Você não precisa compilar nada. O aplicativo já está 100% pronto para uso:
-
-1. Acesse a página de **[Releases Oficiais](https://github.com/kennobitttencourt/Zentro/releases/latest)** ou a nossa **[Página de Download](https://kennobitttencourt.github.io/Zentro/)**.
-2. Baixe o instalador oficial: **`Zentro-macOS-arm64.dmg`**.
-3. Dê um duplo-clique no arquivo `.dmg` baixado.
-4. Arraste o ícone do **Zentro** para a pasta **Aplicativos** (`Applications`).
-5. Pronto! Abra o Zentro pelo Spotlight ou Launchpad e aproveite seu Mac otimizado.
+- 🌟 **Smart Care**: Orbe giroscópico interativo com diagnóstico completo em segundos e relatório unificado de saúde, limpeza e performance do Mac.
+- 🖥️ **Agente na Barra de Menus (Menu Bar)**: Continua ativo em segundo plano na barra superior do macOS mostrando a saúde do Mac, espaço em disco, pressão de memória (com otimização em 1 clique), bateria, carga da CPU, tráfego Wi-Fi ao vivo, Speedtest compacto e drives externos conectados.
+- 🌐 **Teste de Conexão (Speedtest)**: Velocímetro em tempo real de **Download**, **Upload**, **Ping (Latência)** e **Jitter**, com gráficos sparkline ao vivo e diagnóstico automático para **Streaming 4K HDR**, **Cloud Gaming** e **Videochamadas HD**.
+- 🧹 **Limpeza de Sistema**: Remoção segura de caches de usuário, logs de diagnóstico, lixeira, arquivos temporários do Xcode (`DerivedData`), caches de navegadores e gerenciadores de pacotes (`Homebrew`, `NPM`).
+- 👯 **Arquivos Duplicados**: Motor ultrarrápido de comparação por hash criptográfico **SHA-256** para localizar fotos, vídeos, instaladores e documentos repetidos.
+- 📊 **Gerenciamento de Armazenamento**: Mapeamento visual por categorias do disco e filtro inteligente para localizar **Grandes Arquivos (>100 MB)** esquecidos.
+- 🗑️ **Desinstalador Completo**: Remoção completa de aplicativos junto com todos os arquivos residuais ocultos em `~/Library/Application Support`, `Caches`, `Preferences` e `Containers`.
+- 🚀 **Inicialização do Mac**: Gerenciamento de agentes em segundo plano (`LaunchAgents` e `LaunchDaemons`) com classificação de impacto para acelerar a inicialização do macOS.
+- ⚡ **Monitor & RAM**: Telemetria contínua direto do kernel Darwin/Mach, gráficos de histórico de Memória Unificada e CPU por núcleo, lista de processos em destaque e liberação de páginas inativas de RAM.
+- 🌍 **Multilíngue Nativo (`PT-BR` • `EN` • `ES`)**: Seletor integrado com troca instantânea entre **Português do Brasil** (padrão), **Inglês** e **Espanhol**.
 
 ---
 
-## ✨ Recursos
+## 📦 Como Instalar no seu Mac
 
-- 🌟 **Smart Care**: Orbe giroscópico interativo com diagnóstico completo em ~2 segundos e compilação de relatório detalhado sem precisar rolar a página.
-- 🧹 **Limpeza de Sistema**: Exclusão segura de caches de usuário, logs de diagnóstico, lixeira, caches do Xcode DerivedData, navegadores e gerenciadores de pacotes.
-- 👯 **Arquivos Duplicados**: Motor de localização ultrarrápido por hash criptográfico SHA-256 para fotos, vídeos, instaladores e documentos idênticos.
-- 📊 **Gerenciamento de Armazenamento**: Mapeamento do disco e localizador de Grandes Arquivos (>100MB) esquecidos.
-- 🗑️ **Desinstalador Completo**: Remoção definitiva de aplicativos sem deixar resíduos em `~/Library/Application Support`, `Caches`, `Preferences` e `Containers`.
-- 🚀 **Inicialização do Mac**: Controle de itens de inicialização (`LaunchAgents` e `LaunchDaemons`) com classificação de impacto para acelerar o boot.
-- ⚡ **Monitor & RAM**: Leitura contínua direto do kernel Darwin/Mach, gráficos de histórico de CPU/RAM em tempo real e liberação de páginas inativas de RAM.
+1. Acesse a página de **[Releases Oficiais](https://github.com/kennobitttencourt/Zentro/releases/latest)** ou a nossa **[Página Oficial](https://kennobitttencourt.github.io/Zentro/)**.
+2. Baixe o instalador oficial: **`Zentro-macOS-arm64.dmg`**.
+3. Abra o arquivo `.dmg` e arraste o ícone do **Zentro** para a pasta **Aplicativos** (`Applications`).
+4. Abra o Zentro pelo Spotlight ou Launchpad e execute o seu primeiro **Smart Care**!
 
 ---
 
 ## 💻 Requisitos do Sistema
 
-- **macOS**: macOS 14.0 (Sonoma) ou macOS 15.0+ (Sequoia)
+- **Sistema Operacional**: macOS 14.0 (Sonoma) ou macOS 15.0+ (Sequoia)
 - **Processador**: Apple Silicon (M1, M2, M3, M4 ou superior)
-- **Arquitetura**: arm64 nativo puro (consumo inferior a 25 MB de RAM)
+- **Arquitetura**: `arm64` nativo em Swift 6 (consumo inferior a 25 MB de RAM)
+- **Idiomas Inclusos**: Português (Brasil), Inglês e Espanhol
 
 ---
 
 ## 👨‍💻 Código-Fonte & Desenvolvimento
 
-Este é o repositório oficial de **distribuição pública**.
-
-Se você é desenvolvedor, deseja conferir o código-fonte em Swift, abrir *pull requests* ou compilar por conta própria:
-👉 Visite o repositório de desenvolvimento: **[github.com/kennobitttencourt/Zentro-dev](https://github.com/kennobitttencourt/Zentro-dev)**
+Se você deseja conferir o código-fonte em Swift, compilar localmente ou contribuir:
+👉 Repositório de desenvolvimento: **[github.com/kennobitttencourt/zentro-dev](https://github.com/kennobitttencourt/zentro-dev)**
 
 ---
 
