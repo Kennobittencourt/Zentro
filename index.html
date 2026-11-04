@@ -7,7 +7,7 @@
   <meta name="description" content="O otimizador e limpador nativo definitivo para macOS. Desenvolvido por Kenno Bittencourt em Swift puro com estética Dark Glassmorphism.">
   <link rel="icon" type="image/jpeg" href="docs/assets/logo.jpg">
   
-  <!-- Inter Font -->
+  <!-- Plus Jakarta Sans Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,15 +15,23 @@
   <style>
     :root {
       --bg-dark: #07090E;
-      --card-bg: rgba(18, 24, 38, 0.7);
+      --surface-elevated: #0E131F;
+      --card-bg: rgba(18, 24, 38, 0.72);
       --card-border: rgba(255, 255, 255, 0.08);
       --accent: #38BDF8;
-      --accent-glow: rgba(56, 189, 248, 0.35);
+      --accent-glow: rgba(56, 189, 248, 0.28);
       --primary: #0284C7;
       --primary-hover: #0369A1;
-      --text-main: #FFFFFF;
+      --text-main: #F8FAFC;
       --text-muted: #94A3B8;
-      --text-dim: #64748B;
+      --text-dim: #7E92AB;
+      --rose: #FF5E7E;
+
+      /* Motion Director Tokens */
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --dur-micro: 180ms;
+      --dur-reveal: 680ms;
     }
 
     * {
@@ -33,43 +41,103 @@
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
+    html {
+      scroll-behavior: smooth;
+      color-scheme: dark;
+    }
+
+    section[id] {
+      scroll-margin-top: 84px;
+    }
+
+    /* Browser surfaces: themed selection, scrollbar, focus rings & numerals */
+    ::selection {
+      background: rgba(56, 189, 248, 0.25);
+      color: var(--text-main);
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 999px;
+      border: 2px solid var(--bg-dark);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
       overflow-x: hidden;
       line-height: 1.6;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scroll Progress Indicator Bar */
+    .scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent), #818CF8);
+      transform-origin: 0 50%;
+      transform: scaleX(0);
+      z-index: 200;
+      pointer-events: none;
     }
 
     /* Ambient Glow Backgrounds */
     .ambient-glow {
       position: absolute;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(2, 132, 199, 0.15) 0%, rgba(99, 102, 241, 0.08) 50%, transparent 70%);
-      top: -100px;
+      width: 680px;
+      height: 680px;
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.15) 0%, rgba(99, 102, 241, 0.07) 50%, transparent 70%);
+      top: -120px;
       left: 50%;
       transform: translateX(-50%);
       pointer-events: none;
       z-index: 0;
+      animation: ambientBreath 9s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientBreath {
+      0% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+      100% { transform: translateX(-50%) scale(1.12); opacity: 1; }
     }
 
     /* Navigation */
-    html { scroll-behavior: smooth; }
-    section[id] { scroll-margin-top: 80px; }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-
     nav {
       position: sticky;
       top: 0;
       width: 100%;
       backdrop-filter: blur(20px);
-      background: rgba(7, 9, 14, 0.8);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(7, 9, 14, 0.82);
       border-bottom: 1px solid var(--card-border);
       z-index: 100;
       padding: 16px 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: background var(--dur-micro) var(--ease-out-expo), border-color var(--dur-micro) var(--ease-out-expo);
     }
 
     .brand {
@@ -84,23 +152,28 @@
       width: 36px;
       height: 36px;
       border-radius: 9px;
-      box-shadow: 0 4px 14px var(--accent-glow);
+      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.32);
+      transition: transform var(--dur-micro) var(--ease-spring);
+    }
+
+    .brand:hover img {
+      transform: scale(1.06) rotate(-2deg);
     }
 
     .brand-title {
       font-weight: 800;
       font-size: 1.15rem;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.03em;
     }
 
     .brand-badge {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--accent);
-      border: 1px solid rgba(56, 189, 248, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.22);
     }
 
     .nav-links {
@@ -110,58 +183,80 @@
     }
 
     .nav-links a {
+      position: relative;
       color: var(--text-muted);
       text-decoration: none;
       font-size: 0.9rem;
       font-weight: 500;
-      transition: color 0.2s;
+      padding: 4px 0;
+      transition: color var(--dur-micro) var(--ease-out-expo);
     }
 
-    .nav-links a:hover {
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 100%;
+      height: 2px;
+      background: var(--accent);
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: right center;
+      transition: transform 0.26s var(--ease-out-expo);
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
       color: var(--text-main);
     }
 
-    /* Hero Section */
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      transform: scaleX(1);
+      transform-origin: left center;
+    }
+
+    /* Hero Section & Entrance Beat Sequence */
     .hero {
       position: relative;
       z-index: 1;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 80px 24px 60px;
+      padding: 84px 24px 56px;
       text-align: center;
+      perspective: 1200px;
     }
 
-    .author-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border-radius: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 24px;
+    @keyframes heroReveal {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .hero h1 {
-      font-size: 3.4rem;
+      font-size: 3.5rem;
       font-weight: 800;
-      line-height: 1.15;
-      letter-spacing: -1.5px;
+      line-height: 1.12;
+      letter-spacing: -0.035em;
       margin-bottom: 20px;
-      background: linear-gradient(180deg, #FFFFFF 0%, #CBD5E1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: var(--text-main);
+      text-wrap: balance;
+      animation: heroReveal var(--dur-reveal) var(--ease-out-expo) both;
     }
 
     .hero p {
-      font-size: 1.2rem;
+      font-size: 1.18rem;
       color: var(--text-muted);
-      max-width: 680px;
+      max-width: 64ch;
       margin: 0 auto 36px;
       font-weight: 400;
+      animation: heroReveal var(--dur-reveal) var(--ease-out-expo) 90ms both;
     }
 
     /* CTA Buttons */
@@ -170,10 +265,13 @@
       gap: 16px;
       justify-content: center;
       align-items: center;
-      margin-bottom: 48px;
+      margin-bottom: 32px;
+      animation: heroReveal var(--dur-reveal) var(--ease-out-expo) 170ms both;
     }
 
     .btn-download {
+      position: relative;
+      overflow: hidden;
       background: var(--primary);
       color: #FFF;
       text-decoration: none;
@@ -184,19 +282,40 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      transition: all 0.2s;
-      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: background var(--dur-micro) var(--ease-out-expo), transform var(--dur-micro) var(--ease-spring), box-shadow var(--dur-micro) var(--ease-out-expo);
+      box-shadow: 0 10px 26px rgba(2, 132, 199, 0.36);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      will-change: transform;
+    }
+
+    .btn-download::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.55s var(--ease-out-expo);
+    }
+
+    .btn-download:hover::before {
+      left: 140%;
     }
 
     .btn-download:hover {
       background: var(--primary-hover);
       transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(2, 132, 199, 0.6);
+      box-shadow: 0 14px 32px rgba(2, 132, 199, 0.48);
+    }
+
+    .btn-download:active {
+      transform: translateY(0) scale(0.98);
     }
 
     .btn-github {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text-main);
       text-decoration: none;
       font-weight: 600;
@@ -207,119 +326,198 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.2s;
+      transition: background var(--dur-micro) var(--ease-out-expo), border-color var(--dur-micro) var(--ease-out-expo), transform var(--dur-micro) var(--ease-spring);
     }
 
     .btn-github:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateY(-2px);
     }
 
     .sys-specs {
       font-size: 0.85rem;
       color: var(--text-dim);
-      margin-top: -24px;
-      margin-bottom: 50px;
+      margin-bottom: 48px;
+      animation: heroReveal var(--dur-reveal) var(--ease-out-expo) 230ms both;
     }
 
-    /* App Preview Mockup */
-    .mockup-container {
-      position: relative;
+    /* Interactive 3D Hero App Screenshot */
+    .shot-hero {
       max-width: 1000px;
       margin: 0 auto;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      animation: heroReveal 820ms var(--ease-out-expo) 290ms both;
+      transform-style: preserve-3d;
+      transition: transform 0.25s var(--ease-out-expo);
+      will-change: transform;
     }
 
-    .mockup-container img {
+    .shot-hero img,
+    .shot img {
       width: 100%;
       height: auto;
       display: block;
     }
 
+    .shots-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
 
-    .shot-hero { max-width: 1000px; margin: 0 auto; }
-    .shot-hero img, .shot img { width: 100%; height: auto; display: block; }
-    .shots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
-    .shot { margin: 0; text-align: center; }
-    .shot figcaption { margin-top: 8px; color: #94a3b8; font-size: 14px; }
-    @media (max-width: 760px) { .shots-grid { grid-template-columns: 1fr; } }
+    .shot {
+      margin: 0;
+      text-align: center;
+      cursor: zoom-in;
+      transition: transform 0.28s var(--ease-spring);
+    }
 
-    /* Features Grid */
+    .shot:hover {
+      transform: translateY(-4px) scale(1.012);
+    }
+
+    .shot figcaption {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color var(--dur-micro) var(--ease-out-expo);
+    }
+
+    .shot:hover figcaption {
+      color: var(--text-main);
+    }
+
+    @media (max-width: 760px) {
+      .shots-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Scroll Reveal Choreography */
+    .reveal-item {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity var(--dur-reveal) var(--ease-out-expo), transform var(--dur-reveal) var(--ease-out-expo);
+      transition-delay: var(--stagger, 0ms);
+    }
+
+    .reveal-item.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Sections */
     .section {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 90px 24px;
+      padding: 88px 24px;
     }
 
     .section-header {
       text-align: center;
-      margin-bottom: 56px;
+      margin-bottom: 52px;
     }
 
     .section-header h2 {
-      font-size: 2.2rem;
+      font-size: 2.25rem;
       font-weight: 800;
-      letter-spacing: -0.8px;
+      letter-spacing: -0.03em;
       margin-bottom: 12px;
+      color: var(--text-main);
+      text-wrap: balance;
     }
 
     .section-header p {
       color: var(--text-muted);
       font-size: 1.05rem;
+      max-width: 62ch;
+      margin: 0 auto;
     }
 
+    /* Features Grid with Spotlight Cursor Tracking */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
+      gap: 22px;
     }
 
     .feature-card {
+      position: relative;
+      overflow: hidden;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 28px;
       backdrop-filter: blur(16px);
-      transition: transform 0.2s, border-color 0.2s;
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.26);
+      transition: transform 0.24s var(--ease-spring), border-color 0.24s var(--ease-out-expo), box-shadow 0.24s var(--ease-out-expo);
+    }
+
+    .feature-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        420px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(56, 189, 248, 0.11),
+        transparent 45%
+      );
+      opacity: 0;
+      transition: opacity 0.25s var(--ease-out-expo);
+      pointer-events: none;
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
     }
 
     .feature-card:hover {
       transform: translateY(-4px);
-      border-color: rgba(56, 189, 248, 0.3);
+      border-color: rgba(56, 189, 248, 0.32);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.36);
     }
 
     .feature-icon {
-      font-size: 1.8rem;
-      margin-bottom: 16px;
-      display: inline-block;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      transition: transform 0.24s var(--ease-spring), background 0.24s var(--ease-out-expo);
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.08) translateY(-1px);
+      background: rgba(56, 189, 248, 0.18);
     }
 
     .feature-card h3 {
-      font-size: 1.2rem;
+      font-size: 1.18rem;
       font-weight: 700;
+      letter-spacing: -0.015em;
       margin-bottom: 8px;
+      color: var(--text-main);
     }
 
     .feature-card p {
       color: var(--text-muted);
-      font-size: 0.95rem;
-      line-height: 1.5;
+      font-size: 0.94rem;
+      line-height: 1.55;
     }
 
-    /* Screenshot Showcase */
-    .showcase-block {
-      margin-top: 40px;
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
-    }
-
-    .showcase-block img {
-      width: 100%;
-      display: block;
+    .feature-card code,
+    .step-card code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.84rem;
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
     /* Installation Steps */
@@ -331,65 +529,52 @@
     }
 
     .step-card {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(18, 24, 38, 0.55);
       border: 1px solid var(--card-border);
       border-radius: 14px;
-      padding: 24px;
+      padding: 26px 24px;
       text-align: center;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      transition: transform 0.24s var(--ease-spring), border-color 0.24s var(--ease-out-expo);
+    }
+
+    .step-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(56, 189, 248, 0.28);
     }
 
     .step-number {
       width: 36px;
       height: 36px;
-      background: var(--primary);
+      background: rgba(2, 132, 199, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: var(--accent);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
+      font-size: 0.95rem;
       margin: 0 auto 16px;
+      transition: transform 0.24s var(--ease-spring), background 0.24s var(--ease-out-expo);
+    }
+
+    .step-card:hover .step-number {
+      transform: scale(1.1);
+      background: var(--primary);
+      color: #fff;
     }
 
     .step-card h4 {
       font-size: 1.1rem;
-      margin-bottom: 8px;
-    }
-
-    .step-card p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    /* Footer */
-    footer {
-      border-top: 1px solid var(--card-border);
-      padding: 48px 32px;
-      text-align: center;
-      background: rgba(5, 7, 10, 0.9);
-    }
-
-    .footer-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .footer-author {
-      font-size: 1rem;
       font-weight: 700;
       margin-bottom: 8px;
       color: var(--text-main);
     }
 
-    .footer-sub {
+    .step-card p {
       color: var(--text-muted);
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 2.4rem; }
-      .steps-grid { grid-template-columns: 1fr; }
-      .cta-group { flex-direction: column; }
+      font-size: 0.92rem;
     }
 
     /* Support / Contribution Section */
@@ -408,12 +593,20 @@
     }
 
     .support-card {
-      background: rgba(20, 27, 41, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+      overflow: hidden;
+      background: rgba(20, 27, 41, 0.72);
+      border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 28px;
       backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.24s var(--ease-out-expo), transform 0.24s var(--ease-spring);
+    }
+
+    .support-card:hover {
+      border-color: rgba(56, 189, 248, 0.24);
     }
 
     .author-header {
@@ -429,7 +622,12 @@
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--accent);
-      box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
+      box-shadow: 0 6px 18px rgba(56, 189, 248, 0.25);
+      transition: transform 0.28s var(--ease-spring);
+    }
+
+    .support-card:hover .author-avatar {
+      transform: scale(1.04);
     }
 
     .author-meta h3 {
@@ -440,12 +638,16 @@
     }
 
     .author-meta .alias {
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       color: var(--text-muted);
     }
 
     .author-meta .location {
-      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.82rem;
+      font-weight: 600;
       color: var(--accent);
       margin-top: 4px;
     }
@@ -466,13 +668,26 @@
     .bio-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
+      gap: 10px;
+      font-size: 0.86rem;
+      font-weight: 500;
       color: var(--text-main);
-      background: rgba(255, 255, 255, 0.04);
-      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.035);
+      padding: 7px 12px;
       border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: transform var(--dur-micro) var(--ease-spring), background var(--dur-micro) var(--ease-out-expo), border-color var(--dur-micro) var(--ease-out-expo);
+    }
+
+    .bio-badge:hover {
+      transform: translateX(4px);
+      background: rgba(255, 255, 255, 0.065);
+      border-color: rgba(56, 189, 248, 0.24);
+    }
+
+    .bio-badge svg {
+      color: var(--accent);
+      flex-shrink: 0;
     }
 
     .pix-card-content {
@@ -482,17 +697,44 @@
       text-align: center;
     }
 
+    .pix-header-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .pix-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.24);
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
     .qr-container {
       background: #FFFFFF;
       padding: 12px;
       border-radius: 14px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
       margin: 16px 0;
       width: 190px;
       height: 190px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.28s var(--ease-spring), box-shadow 0.28s var(--ease-out-expo);
+    }
+
+    .qr-container:hover {
+      transform: scale(1.035);
+      box-shadow: 0 14px 34px rgba(56, 189, 248, 0.22);
     }
 
     .qr-container img {
@@ -509,24 +751,30 @@
       padding: 12px 16px;
       margin-bottom: 14px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
       text-align: left;
     }
 
     .pix-details .label {
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       color: var(--text-dim);
       font-weight: 700;
       text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
     .pix-details .key {
-      font-size: 1.15rem;
+      font-size: 0.92rem;
       font-weight: 700;
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
       color: var(--text-main);
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
+      text-align: center;
+      padding: 7px 8px;
+      background: rgba(0, 0, 0, 0.28);
+      border-radius: 6px;
     }
 
     .pix-details .beneficiary {
@@ -543,49 +791,156 @@
       font-size: 0.95rem;
       padding: 12px 20px;
       border-radius: 10px;
-      border: none;
+      border: 1px solid rgba(255, 255, 255, 0.16);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      transition: all 0.2s;
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.28);
+      transition: background var(--dur-micro) var(--ease-out-expo), transform var(--dur-micro) var(--ease-spring);
     }
 
     .btn-copy-pix:hover {
       background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-copy-pix:active {
+      transform: translateY(0) scale(0.98);
     }
 
     .social-btn {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       font-size: 0.85rem;
-      font-weight: 500;
+      font-weight: 600;
       color: var(--accent);
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 8px 14px;
       border-radius: 8px;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all var(--dur-micro) var(--ease-spring);
     }
+
     .social-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
       border-color: var(--accent);
       color: #fff;
+      transform: translateY(-2px);
     }
+
     .social-insta {
-      color: #FF5E7E;
+      color: var(--rose);
     }
+
     .social-insta:hover {
-      border-color: #FF5E7E;
+      border-color: var(--rose);
       color: #fff;
+    }
+
+    /* Screenshot Lightbox Overlay */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s var(--ease-out-expo);
+      cursor: zoom-out;
+    }
+
+    .lightbox.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox img {
+      max-width: min(1160px, 94vw);
+      max-height: 82vh;
+      width: auto;
+      height: auto;
+      border-radius: 14px;
+      transform: scale(0.95);
+      transition: transform 0.32s var(--ease-spring);
+    }
+
+    .lightbox.open img {
+      transform: scale(1);
+    }
+
+    .lightbox-caption {
+      margin-top: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 48px 32px;
+      text-align: center;
+      background: rgba(5, 7, 10, 0.92);
+    }
+
+    .footer-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .footer-author {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-main);
+    }
+
+    .footer-sub {
+      color: var(--text-muted);
+      font-size: 0.86rem;
+      margin-bottom: 18px;
+    }
+
+    /* Designed Reduced-Motion Path (Motion Director Spec) */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .ambient-glow { animation: none; }
+      .hero h1, .hero p, .cta-group, .sys-specs, .shot-hero {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .reveal-item {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      .btn-download::before { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 14px; font-size: 0.82rem; }
+      .hero h1 { font-size: 2.35rem; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .cta-group { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
+  <div class="scroll-progress" id="scrollProgress"></div>
   <div class="ambient-glow"></div>
 
   <!-- Navigation -->
@@ -595,35 +950,32 @@
       <span class="brand-title">Zentro</span>
       <span class="brand-badge">v1.0</span>
     </a>
-    <div class="nav-links">
-      <a href="#recursos">Recursos</a>
-      <a href="#screenshots">Screenshots</a>
-      <a href="#instalacao">Como Instalar</a>
-      <a href="#apoiar">Apoiar</a>
-      <a href="https://www.instagram.com/kennobittencourt" target="_blank">Instagram</a>
-      <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank">LinkedIn</a>
+    <div class="nav-links" id="navLinks">
+      <a href="#recursos" data-section="recursos">Recursos</a>
+      <a href="#screenshots" data-section="screenshots">Screenshots</a>
+      <a href="#instalacao" data-section="instalacao">Como Instalar</a>
+      <a href="#apoiar" data-section="apoiar">Apoiar</a>
+      <a href="https://www.instagram.com/kennobittencourt" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
   </nav>
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="author-tag">
-      <span>👨‍💻 Desenvolvido por Kenno Bittencourt</span>
-    </div>
-    <h1>Otimizador & Limpador<br/>Nativo para macOS</h1>
+    <h1>Otimizador &amp; Limpador<br/>Nativo para macOS</h1>
     <p>
       Inspirado na precisão e fluidez do Mac. Limpeza profunda de resíduos, detecção veloz de duplicados e monitoramento de hardware em tempo real para Apple Silicon.
     </p>
 
     <div class="cta-group">
-      <a href="https://github.com/Kennobittencourt/Zentro/releases/latest/download/Zentro-macOS-arm64.dmg" class="btn-download">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <a href="https://github.com/Kennobittencourt/Zentro/releases/latest/download/Zentro-macOS-arm64.dmg" class="btn-download" id="heroDownloadBtn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-2 .6-2.65 1.35-.58.67-.99 1.74-.86 2.77.99.08 2.01-.52 2.59-1.27z"/>
         </svg>
         Baixar para macOS (Apple Silicon)
       </a>
-      <a href="https://www.linkedin.com/in/antoniojoelson/" class="btn-github" target="_blank">
-        Conectar no LinkedIn
+      <a href="https://www.linkedin.com/in/antoniojoelson/" class="btn-github" target="_blank" rel="noopener">
+        Por Kenno Bittencourt
       </a>
     </div>
 
@@ -631,52 +983,82 @@
       Requer macOS 14.0 (Sonoma) ou macOS 15.0+ (Sequoia) • Apple Silicon (M1/M2/M3/M4)
     </div>
 
-    <!-- App Screenshot -->
-    <div class="shot-hero">
+    <!-- App Screenshot with Interactive 3D Tilt -->
+    <div class="shot-hero" id="heroShot">
       <img src="docs/assets/screenshots/smart-care.png" alt="Zentro - Smart Care">
     </div>
   </section>
+
   <!-- Features Section -->
   <section class="section" id="recursos">
-    <div class="section-header">
+    <div class="section-header reveal-item">
       <h2>Tudo o que seu Mac precisa para voar</h2>
       <p>Desenvolvido em Swift 6 e SwiftUI puro. Consome menos de 25 MB de RAM.</p>
     </div>
 
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🌟</div>
+      <div class="feature-card reveal-item" style="--stagger: 0ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
         <h3>Smart Care</h3>
         <p>Orbe giroscópico interativo que analisa a saúde do sistema e compila um relatório de diagnóstico em segundos com 1 clique.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">🧹</div>
+      <div class="feature-card reveal-item" style="--stagger: 60ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>
+          </svg>
+        </div>
         <h3>Limpeza de Sistema</h3>
         <p>Varredura de caches de usuário, logs de diagnóstico, lixeira, arquivos do Xcode DerivedData e navegadores sem risco.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">👯</div>
+      <div class="feature-card reveal-item" style="--stagger: 120ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+          </svg>
+        </div>
         <h3>Arquivos Duplicados</h3>
         <p>Motor de identificação por hash SHA-256 ultra-rápido. Encontre fotos, vídeos e instaladores repetidos com descarte seguro.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">📊</div>
+      <div class="feature-card reveal-item" style="--stagger: 180ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          </svg>
+        </div>
         <h3>Mapeamento de Disco</h3>
-        <p>Visualização categorizada do espaço em disco e filtro inteligente para localizar grandes arquivos esquecidos (>100MB).</p>
+        <p>Visualização categorizada do espaço em disco e filtro inteligente para localizar grandes arquivos esquecidos (&gt;100MB).</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">🗑️</div>
+      <div class="feature-card reveal-item" style="--stagger: 240ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"/>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          </svg>
+        </div>
         <h3>Desinstalador Completo</h3>
         <p>Remova aplicativos e todos os arquivos residuais ocultos em <code>~/Library/Application Support</code>, <code>Caches</code> e <code>Preferences</code>.</p>
       </div>
 
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Monitor & RAM</h3>
+      <div class="feature-card reveal-item" style="--stagger: 300ms;">
+        <div class="feature-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+        </div>
+        <h3>Monitor &amp; RAM</h3>
         <p>Estatísticas em tempo real direto do kernel Darwin/Mach, gráficos de histórico de CPU/RAM e botão de liberação de páginas inativas.</p>
       </div>
     </div>
@@ -684,41 +1066,41 @@
 
   <!-- Screenshots Gallery -->
   <section class="section" id="screenshots">
-    <div class="section-header">
+    <div class="section-header reveal-item">
       <h2>Veja o Zentro em ação</h2>
-      <p>Capturas reais do aplicativo rodando no macOS.</p>
+      <p>Capturas reais do aplicativo rodando no macOS. Clique em qualquer tela para ampliar.</p>
     </div>
 
     <div class="shots-grid">
-      <figure class="shot"><img src="docs/assets/screenshots/scan.png" alt="Zentro - Diagnóstico em andamento" loading="lazy"><figcaption>Diagnóstico em andamento</figcaption></figure>
-      <figure class="shot"><img src="docs/assets/screenshots/armazenamento.png" alt="Zentro - Armazenamento" loading="lazy"><figcaption>Armazenamento</figcaption></figure>
-      <figure class="shot"><img src="docs/assets/screenshots/desinstalador.png" alt="Zentro - Desinstalador" loading="lazy"><figcaption>Desinstalador</figcaption></figure>
-      <figure class="shot"><img src="docs/assets/screenshots/inicializacao.png" alt="Zentro - Inicialização" loading="lazy"><figcaption>Inicialização</figcaption></figure>
-      <figure class="shot"><img src="docs/assets/screenshots/monitor.png" alt="Zentro - Monitor &amp; RAM" loading="lazy"><figcaption>Monitor &amp; RAM</figcaption></figure>
+      <figure class="shot reveal-item" style="--stagger: 0ms;"><img src="docs/assets/screenshots/scan.png" alt="Zentro - Diagnóstico em andamento" loading="lazy"><figcaption>Diagnóstico em andamento</figcaption></figure>
+      <figure class="shot reveal-item" style="--stagger: 70ms;"><img src="docs/assets/screenshots/armazenamento.png" alt="Zentro - Armazenamento" loading="lazy"><figcaption>Armazenamento</figcaption></figure>
+      <figure class="shot reveal-item" style="--stagger: 140ms;"><img src="docs/assets/screenshots/desinstalador.png" alt="Zentro - Desinstalador" loading="lazy"><figcaption>Desinstalador</figcaption></figure>
+      <figure class="shot reveal-item" style="--stagger: 210ms;"><img src="docs/assets/screenshots/inicializacao.png" alt="Zentro - Inicialização" loading="lazy"><figcaption>Inicialização</figcaption></figure>
+      <figure class="shot reveal-item" style="--stagger: 280ms;"><img src="docs/assets/screenshots/monitor.png" alt="Zentro - Monitor &amp; RAM" loading="lazy"><figcaption>Monitor &amp; RAM</figcaption></figure>
     </div>
   </section>
 
   <!-- Installation Steps -->
   <section class="section" id="instalacao">
-    <div class="section-header">
+    <div class="section-header reveal-item">
       <h2>Como Instalar o Zentro</h2>
       <p>Simples, direto e sem instaladores invasivos.</p>
     </div>
 
     <div class="steps-grid">
-      <div class="step-card">
+      <div class="step-card reveal-item" style="--stagger: 0ms;">
         <div class="step-number">1</div>
         <h4>Baixe o Instalador</h4>
         <p>Faça o download do arquivo <code>.dmg</code> ou <code>.zip</code> da versão mais recente.</p>
       </div>
 
-      <div class="step-card">
+      <div class="step-card reveal-item" style="--stagger: 80ms;">
         <div class="step-number">2</div>
         <h4>Arraste para Aplicativos</h4>
         <p>Abra o instalador e arraste o ícone do <strong>Zentro</strong> para a sua pasta de Aplicativos.</p>
       </div>
 
-      <div class="step-card">
+      <div class="step-card reveal-item" style="--stagger: 160ms;">
         <div class="step-number">3</div>
         <h4>Pronto para Usar</h4>
         <p>Abra o Zentro pelo Launchpad ou Spotlight e faça seu primeiro Smart Scan.</p>
@@ -728,23 +1110,26 @@
 
   <!-- Support / Contribution Section -->
   <section class="section" id="apoiar">
-    <div class="section-header">
-      <div class="author-tag" style="color: #FF5E7E; border-color: rgba(255, 94, 126, 0.3);">
-        <span>❤️ Apoie o Projeto</span>
-      </div>
+    <div class="section-header reveal-item">
       <h2>Mantenha o Zentro Independente</h2>
       <p>O Zentro é e continuará sendo gratuito e de código aberto. Você pode contribuir com o valor que desejar para apoiar o desenvolvimento contínuo.</p>
     </div>
 
     <div class="support-card-container">
       <!-- Profile Card -->
-      <div class="support-card">
+      <div class="support-card reveal-item" style="--stagger: 0ms;">
         <div class="author-header">
           <img src="docs/assets/kenno.png" alt="Kenno Bittencourt" class="author-avatar" onerror="this.src='docs/assets/kenno.jpeg'">
           <div class="author-meta">
             <h3>Kenno Bittencourt</h3>
             <div class="alias">Antonio Joelson</div>
-            <div class="location">📍 Bahia, Brasil</div>
+            <div class="location">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Bahia, Brasil</span>
+            </div>
           </div>
         </div>
 
@@ -754,53 +1139,92 @@
 
         <div class="bio-badge-list">
           <div class="bio-badge">
-            <span>🎓</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
             <span>Bacharel em Design</span>
           </div>
           <div class="bio-badge">
-            <span>🎨</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+              <polyline points="2 17 12 22 22 17"/>
+              <polyline points="2 12 12 17 22 12"/>
+            </svg>
             <span>Especialista em Design de Produtos Digitais</span>
           </div>
           <div class="bio-badge">
-            <span>🛡️</span>
-            <span>Compromisso com privacidade & transparência</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Compromisso com privacidade &amp; transparência</span>
           </div>
           <div class="bio-badge">
-            <span>⚡</span>
-            <span>Performance nativa macOS & zero rastreadores</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="18" height="12" x="3" y="4" rx="2" ry="2"/>
+              <line x1="2" x2="22" y1="20" y2="20"/>
+            </svg>
+            <span>Performance nativa macOS &amp; zero rastreadores</span>
           </div>
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
-          <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank" class="social-btn">
-            🔗 LinkedIn
+          <a href="https://www.linkedin.com/in/antoniojoelson/" target="_blank" rel="noopener" class="social-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span>LinkedIn</span>
           </a>
-          <a href="https://www.instagram.com/kennobittencourt" target="_blank" class="social-btn social-insta">
-            📸 Instagram @kennobittencourt
+          <a href="https://www.instagram.com/kennobittencourt" target="_blank" rel="noopener" class="social-btn social-insta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+            </svg>
+            <span>Instagram @kennobittencourt</span>
           </a>
         </div>
       </div>
 
       <!-- PIX Card -->
-      <div class="support-card pix-card-content">
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Contribuição via PIX</div>
-        <h4 style="font-size: 1.25rem; font-weight: 700; margin: 4px 0 8px; color: var(--text-main);">Contribua com qualquer valor</h4>
-        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">Aponte a câmera do aplicativo do seu banco para o QR Code abaixo:</p>
+      <div class="support-card pix-card-content reveal-item" style="--stagger: 90ms;">
+        <div class="pix-header-row">
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-main);">Contribua com qualquer valor</h3>
+          <span class="pix-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect width="5" height="5" x="3" y="3" rx="1"/>
+              <rect width="5" height="5" x="16" y="3" rx="1"/>
+              <rect width="5" height="5" x="3" y="16" rx="1"/>
+              <path d="M21 16h-3a2 2 0 0 0-2 2v3"/>
+              <path d="M21 21v.01"/>
+              <path d="M12 7v3a2 2 0 0 1-2 2H7"/>
+              <path d="M3 12h.01"/>
+              <path d="M12 3h.01"/>
+              <path d="M12 16v.01"/>
+              <path d="M16 12h1"/>
+              <path d="M21 12v.01"/>
+              <path d="M12 21v-1"/>
+            </svg>
+            PIX
+          </span>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 6px; text-align: left; width: 100%;">Aponte a câmera do aplicativo do seu banco para o QR Code abaixo:</p>
 
         <div class="qr-container">
           <img src="docs/assets/pix_qrcode.png" alt="QR Code PIX Banco Itaú">
         </div>
 
-        <div class="pix-details" style="flex-direction: column; align-items: stretch; gap: 8px;">
+        <div class="pix-details">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span class="label" style="white-space: nowrap;">Chave Aleatória (Banco Itaú)</span>
             <span class="beneficiary" style="white-space: nowrap;"><span class="label">Titular:</span> <span style="font-weight: 600; color: var(--text-main);">Antonio Joelson</span></span>
           </div>
-          <div class="key" id="pixKeyText" style="font-size: 0.92rem; text-align: center; padding: 6px; background: rgba(0,0,0,0.25); border-radius: 6px; letter-spacing: 0.5px;">c234ecbb-6bf3-45e7-b08a-452425e39869</div>
+          <div class="key" id="pixKeyText">c234ecbb-6bf3-45e7-b08a-452425e39869</div>
         </div>
 
         <button class="btn-copy-pix" id="copyPixBtn" onclick="copyPixKey()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
           </svg>
@@ -809,6 +1233,12 @@
       </div>
     </div>
   </section>
+
+  <!-- Lightbox Modal for Screenshots -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Visualização ampliada">
+    <img src="" alt="" id="lightboxImg">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
 
   <!-- Footer -->
   <footer>
@@ -828,14 +1258,108 @@
         const btn = document.getElementById("copyPixBtn");
         const btnText = document.getElementById("copyPixBtnText");
         btn.style.background = "#10B981";
-        btnText.innerText = "✓ Chave PIX Copiada!";
+        btnText.innerText = "Chave PIX Copiada!";
         setTimeout(() => {
           btn.style.background = "";
           btnText.innerText = "Copiar Chave Aleatória";
-        }, 3000);
+        }, 2500);
+      });
+    }
+
+    // Motion Director Choreography (Respects prefers-reduced-motion)
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // 1. Scroll Reveal Observer
+    const revealItems = document.querySelectorAll(".reveal-item");
+    if (!prefersReducedMotion && "IntersectionObserver" in window) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.14, rootMargin: "0px 0px -40px 0px" });
+
+      revealItems.forEach((el) => revealObserver.observe(el));
+    } else {
+      revealItems.forEach((el) => el.classList.add("is-visible"));
+    }
+
+    // 2. Scroll Progress & Active Section Spy
+    const scrollProgress = document.getElementById("scrollProgress");
+    const sections = document.querySelectorAll("section[id]");
+    const navLinks = document.querySelectorAll("#navLinks a[data-section]");
+
+    window.addEventListener("scroll", () => {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0 && scrollProgress) {
+        const progress = Math.min(1, Math.max(0, window.scrollY / docHeight));
+        scrollProgress.style.transform = `scaleX(${progress})`;
+      }
+
+      let currentSection = "";
+      sections.forEach((sec) => {
+        const top = sec.offsetTop - 140;
+        if (window.scrollY >= top) {
+          currentSection = sec.getAttribute("id");
+        }
+      });
+
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.dataset.section === currentSection);
+      });
+    }, { passive: true });
+
+    // 3. Cursor Spotlight on Feature Cards
+    if (!prefersReducedMotion) {
+      document.querySelectorAll(".feature-card").forEach((card) => {
+        card.addEventListener("mousemove", (e) => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty("--mouse-x", `${e.clientX - rect.left}px`);
+          card.style.setProperty("--mouse-y", `${e.clientY - rect.top}px`);
+        });
+      });
+
+      // 4. Interactive 3D Parallax on Hero App Screenshot
+      const heroShot = document.getElementById("heroShot");
+      if (heroShot) {
+        heroShot.addEventListener("mousemove", (e) => {
+          const rect = heroShot.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          heroShot.style.transform = `rotateY(${x * 6}deg) rotateX(${-y * 6}deg) scale(1.01)`;
+        });
+        heroShot.addEventListener("mouseleave", () => {
+          heroShot.style.transform = "rotateY(0deg) rotateX(0deg) scale(1)";
+        });
+      }
+    }
+
+    // 5. Interactive Lightbox for App Screenshots
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightboxImg");
+    const lightboxCaption = document.getElementById("lightboxCaption");
+
+    document.querySelectorAll(".shot").forEach((figure) => {
+      figure.addEventListener("click", () => {
+        const img = figure.querySelector("img");
+        const cap = figure.querySelector("figcaption");
+        if (img && lightbox && lightboxImg) {
+          lightboxImg.src = img.src;
+          lightboxImg.alt = img.alt;
+          lightboxCaption.textContent = cap ? cap.textContent : "";
+          lightbox.classList.add("open");
+        }
+      });
+    });
+
+    if (lightbox) {
+      lightbox.addEventListener("click", () => lightbox.classList.remove("open"));
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") lightbox.classList.remove("open");
       });
     }
   </script>
-
 </body>
 </html>
